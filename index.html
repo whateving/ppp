@@ -83,10 +83,6 @@
         <!-- Terminal Output Area -->
         <main id="terminal-container" class="flex-1 overflow-y-auto p-4 md:p-8 no-scrollbar pb-32">
             <div class="max-w-4xl mx-auto space-y-4">
-                <div class="mb-8 text-sm text-gray-300 border-l-2 border-gray-700 pl-4 py-2">
-                    <p>Hello friend.</p>
-                    <p>Hit <span class="bg-gray-800 px-2 py-0.5 rounded text-white font-bold">&lt;ENTER&gt;</span> to access the skills database.</p>
-                </div>
                 
                 <div id="history"></div>
 
@@ -144,6 +140,19 @@
                 mainInterface.classList.remove('hidden');
                 mainInterface.classList.add('flex');
                 lucide.createIcons();
+                
+                // --- NEW STARTUP SEQUENCE ---
+                
+                // 1. Initial welcome message (now in JS)
+                addToHistory(`
+                    <div class="mb-8 text-sm text-gray-300 border-l-2 border-gray-700 pl-4 py-2">
+                        <p>Hello friend.</p>
+                        <p>Accessing skills database... <span class="text-green-500">COMPLETE</span>.</p>
+                    </div>`, false); 
+
+                // 2. Automatically run 'help' to show options immediately
+                runCmd('help', true); 
+
                 input.focus();
             }, 800);
         }
@@ -162,18 +171,22 @@
             lucide.createIcons();
         }
 
-        function runCmd(cmd) {
+        // Added isAutoRun parameter to control if the command prompt line is added to history
+        function runCmd(cmd, isAutoRun = false) {
             const rawCmd = cmd ? cmd.trim().toLowerCase() : '';
             
             // If empty command (Enter key), show help
-            if (!rawCmd) {
-                addToHistory('', true);
-                runCmd('help');
+            if (!rawCmd && !isAutoRun) {
+                addToHistory('', true); // Show the empty prompt line
+                runCmd('help', true); // Run help automatically, suppressing the 'help' prompt
                 input.value = '';
                 return;
             }
             
-            addToHistory(cmd, true);
+            // Only add the command to history if it's a manual input
+            if (!isAutoRun) {
+                addToHistory(cmd, true);
+            }
             input.value = '';
 
             switch(rawCmd) {
@@ -220,8 +233,9 @@
                                 <p>• Web Application Security (OWASP)</p>
                                 <p>• Exploit Development (Python/C)</p>
                                 <p>• Social Engineering Simulations</p>
+                                <p>• CVE Exploitations</p>
                             </div>
-                            <a href="https://github.com/${GITHUB_USERNAME}?tab=repositories&q=red" target="_blank" class="inline-block mt-4 bg-red-600 text-black px-3 py-1 font-bold text-sm hover:bg-red-500 transition-colors">VIEW RED TEAM REPOS</a>
+                            <a href="https://github.com/${GITHUB_USERNAME}/Red-Team-Skills" target="_blank" class="inline-block mt-4 bg-red-600 text-black px-3 py-1 font-bold text-sm hover:bg-red-500 transition-colors">VIEW RED TEAM REPOS</a>
                         </div>
                     `);
                     break;
@@ -235,7 +249,7 @@
                                 <p>• SIEM Architecture (Splunk/ELK)</p>
                                 <p>• Malware Analysis & Reverse Engineering</p>
                             </div>
-                            <a href="https://github.com/${GITHUB_USERNAME}?tab=repositories&q=blue" target="_blank" class="inline-block mt-4 bg-blue-600 text-black px-3 py-1 font-bold text-sm hover:bg-blue-500 transition-colors">VIEW BLUE TEAM REPOS</a>
+                            <a href="https://github.com/${GITHUB_USERNAME}/Blue-Team-Skills" target="_blank" class="inline-block mt-4 bg-blue-600 text-black px-3 py-1 font-bold text-sm hover:bg-blue-500 transition-colors">VIEW BLUE TEAM REPOS</a>
                         </div>
                     `);
                     break;
